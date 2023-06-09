@@ -1,0 +1,110 @@
+#required packages 
+install.packages("zoo")
+library(zoo)
+install.packages("ggplot2")
+library(ggplot2)
+
+#set the work directory
+setwd(D:\New folder\mohamed bahaa")
+
+#read the data file
+ds <- read.csv("G2_anthropometry.csv")
+
+#get structure of the data
+print(str(ds))
+
+#print the data dimension 
+dim(ds)  
+
+#data summary
+print(summary(ds))
+
+
+
+#data columns name
+print(colnames(ds))
+
+#number of rows & columns 
+print(nrow(ds))
+print(ncol(ds))
+
+
+
+#convert cm word to M representing of male
+ds$gender[ds$gender == "cm"] = 'M'
+
+#round age column to get clear age
+ds$age <- round(ds$age)
+
+#print all rows that contain missing data
+ds[ ! complete.cases(ds), ]
+
+#get all locations of NA values
+complete.cases(ds)
+
+#number of missing value in each column
+colSums(is.na(ds))
+
+#fill missing data in foot_length
+ds$foot_length <- na.locf(ds$foot_length)
+
+#check number of missing values now
+sum(is.na(ds))
+
+#removing cm text from height column 
+ds$height <- gsub(" cm","", ds$height)
+
+#convert height column to numeric
+ds$height <- as.numeric(ds$height)
+
+#check the new data type of height
+class(ds$height)
+
+#Re-coding gender column.
+ds$new_variable[ds$gender == "M"] = "1"
+ds$new_variable[ds$gender == "F"] = "2"
+ds
+
+#Sort data according to age
+print(sort1 <- ds[order(ds$age), ])
+
+#VISUALIZATION
+
+#scatter plot visualization of age and foot_length
+ggplot(ds, aes(x = age, y = foot_length)) +
+  geom_point() +
+  ggtitle("Scatter plot of age and foot_length") +
+  xlab("age") +
+  ylab("foot_length")
+
+#scatter plot visualization of height and foot_length
+ggplot(ds, aes(x= height, y = foot_length))+
+  geom_point()+
+  ggtitle("Scatter plot of height and foot length")+
+  xlab("Height")+
+  ylab("Foot length")
+
+
+#visualize the most popular gender
+ggplot(ds, aes(x = gender)) +
+  geom_bar( fill = "darkblue", color = "white") +
+  ggtitle("Genders") +
+  xlab("Gender") +
+  ylab("Frequency")
+
+#visualize the most popular age
+ggplot(ds, aes(x = age)) +
+  geom_bar( fill = "darkblue", color = "white") +
+  ggtitle("Ages") +
+  xlab("Age") +
+  ylab("Frequency")
+
+#the mean of foot length for each gender
+lmean <- aggregate(foot_length ~ gender, data = ds, mean)
+
+# Create a bar chart of mean foot length by gender
+ggplot(lmean, aes(x = gender, y = foot_length)) +
+  geom_bar(stat = "identity", fill = "darkblue") +
+  ggtitle("Mean of foot length by Gender") +
+  xlab("Gender") +
+  ylab("Mean of foot length")
